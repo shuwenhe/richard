@@ -98,7 +98,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
 void genericFight(int enemyHp, int enemyDamage, int enemySkillChance, int enemySkillDamage,
                   int& playerHp, int& wineCount, bool& canTransform, bool& hasDefeatedGuangzhi,
                   bool& hasTransformed, int& mana, const std::string& enemyName,
-                  bool canDodge, int snakeCount, bool& hasDefeatedLingxuzi, int& baseHp) {
+                  bool canDodge, int snakeCount, bool& hasDefeatedLingxuzi, int& baseHp, bool& hasDefeatedGuangmou) {
     int attackCount = 0, freezeCount = 0;
     while (1) {
         playerHp = baseHp;
@@ -129,6 +129,9 @@ void genericFight(int enemyHp, int enemyDamage, int enemySkillChance, int enemyS
                 baseHp += 100;
                 std::cout << "获得金丹一枚，基础生命值增加 100。";
                 std::cout << "获得行者套，装备后增加 60 生命值。";
+            } else if (enemyName == "广谋") {
+                hasDefeatedGuangmou = true;
+                std::cout << "解锁申猴选项。";
             }
             std::cout << std::endl;
             break;
@@ -211,40 +214,60 @@ void landTemple(int& baseHp, bool& hasDefeatedLingxuzi) {
               << "，当前基础生命值变为: " << baseHp << std::endl;
 }
 
+// 申猴功能函数
+void shenhouFunction(int& wineCount) {
+    std::cout << "你选择了申猴，是否要升级酒增加一次喝的次数？(y/n): ";
+    char choice;
+    std::cin >> choice;
+    if (!isValidInput()) return;
+    if (choice == 'y') {
+        wineCount++;
+        std::cout << "酒的使用次数增加一次，当前酒的次数: " << wineCount << std::endl;
+    }
+}
+
 int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
     int playerHp = 300, wineCount = 5, mana = 300;
     bool canTransform = false, hasDefeatedGuangzhi = false, hasTransformed = false;
     bool hasDefeatedLingxuzi = false;
+    bool hasDefeatedGuangmou = false;
     int baseHp = 300 + 30;
 
     landTemple(baseHp, hasDefeatedLingxuzi);
 
     while (1) {
         std::cout << "\n=== 黑神话：悟空 ===" << std::endl;
-        std::cout << "1.大头怪 2.广智 3.灵虚子 4.广谋 5.土地庙 6.白衣秀士 7.退出: ";
+        std::cout << "1.大头怪 2.广智 3.灵虚子 4.广谋 5.土地庙 6.白衣秀士 ";
+        if (hasDefeatedGuangmou) {
+            std::cout << "7.申猴 ";
+        }
+        std::cout << (hasDefeatedGuangmou ? "8" : "7") << ".退出: ";
         char choice;
         std::cin >> choice;
         if (!isValidInput()) continue;
         if (choice == '1')
             genericFight(3000, 50, 20, 200, playerHp, wineCount, canTransform, hasDefeatedGuangzhi,
-                         hasTransformed, mana, "大头怪", true, 0, hasDefeatedLingxuzi, baseHp);
+                         hasTransformed, mana, "大头怪", true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedGuangmou);
         else if (choice == '2')
             genericFight(1500, 30, 10, 80, playerHp, wineCount, canTransform, hasDefeatedGuangzhi,
-                         hasTransformed, mana, "广智", true, 0, hasDefeatedLingxuzi, baseHp);
+                         hasTransformed, mana, "广智", true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedGuangmou);
         else if (choice == '3')
             genericFight(3500, 35, 0, 150, playerHp, wineCount, canTransform, hasDefeatedGuangzhi,
-                         hasTransformed, mana, "灵虚子", true, 0, hasDefeatedLingxuzi, baseHp);
+                         hasTransformed, mana, "灵虚子", true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedGuangmou);
         else if (choice == '4')
             genericFight(1500, 35, 0, 0, playerHp, wineCount, canTransform, hasDefeatedGuangzhi,
-                         hasTransformed, mana, "广谋", true, 5, hasDefeatedLingxuzi, baseHp);
+                         hasTransformed, mana, "广谋", true, 5, hasDefeatedLingxuzi, baseHp, hasDefeatedGuangmou);
         else if (choice == '5')
             landTemple(baseHp, hasDefeatedLingxuzi);
         else if (choice == '6')
             fightWithWhiteScholar(playerHp, wineCount, canTransform, hasDefeatedGuangzhi,
                                   hasTransformed, mana, hasDefeatedLingxuzi, baseHp);
-        else if (choice == '7')
+        else if ((hasDefeatedGuangmou && choice == '7') || (!hasDefeatedGuangmou && choice == '7'))
             return 0;
+        else if (hasDefeatedGuangmou && choice == '7') {
+            shenhouFunction(wineCount);
+        }
         else
             std::cout << "无效选择。" << std::endl;
     }
