@@ -519,13 +519,12 @@ void shenhou(bool& canUpgradeDrink, int& maxDrinkCount) {
         }
     }
 }
-
 int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
     int playerHp = 300, wineCount = 5, mana = 300;
     bool canTransform = false, hasDefeatedGuangzhi = false, hasTransformed = false;
     bool hasDefeatedLingxuzi = false;
-    int baseHp = 300 + 30;
+    int baseHp = 300 + 30; // 初始装备虎皮裙
 
     bool hasDefeatedBigMonster = false;
     bool hasDefeatedGuangzhiEnemy = false;
@@ -557,7 +556,7 @@ int main() {
         std::cout << "4. 退出" << std::endl;
         std::cout << "请选择: ";
         char mainChoice;
-        if (!(std::cin >> mainChoice) ||!isValidInput()) continue;
+        if (!(std::cin >> mainChoice) || !isValidInput()) continue;
         switch (mainChoice) {
             case '1': {
                 std::cout << "可选战斗：";
@@ -570,6 +569,40 @@ int main() {
                 std::cout << std::endl;
                 std::cout << "请选择要挑战的怪物（输入对应数字，输入其他返回主菜单）: ";
                 char fightChoice;
-                if (!(std::cin >> fightChoice) ||!isValidInput()) continue;
-                if (fightChoice == '1' &&!hasDefeatedBigMonster) {
-                    genericFight(3000, 50, 20, 200, playerHp, wineCount, mana, canTransform
+                if (!(std::cin >> fightChoice) || !isValidInput()) continue;
+                if (fightChoice == '1' && !hasDefeatedBigMonster) {
+                    // 补全genericFight的所有参数
+                    genericFight(3000, 50, 20, 200, playerHp, wineCount, mana, canTransform,
+                                hasDefeatedGuangzhi, hasTransformed, "大头怪",
+                                true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedBigMonster,
+                                canUpgradeDrink, maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit,
+                                currentSpirit, attackCounter, hasDefeatedBlackWindKing,
+                                invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+                    hasDefeatedBigMonster = true; // 标记为已击败
+                } else if (fightChoice == '2' && !hasDefeatedGuangzhiEnemy) {
+                    genericFight(2500, 60, 15, 180, playerHp, wineCount, mana, canTransform,
+                                hasDefeatedGuangzhi, hasTransformed, "广智",
+                                false, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedGuangzhiEnemy,
+                                canUpgradeDrink, maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit,
+                                currentSpirit, attackCounter, hasDefeatedBlackWindKing,
+                                invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+                    hasDefeatedGuangzhiEnemy = true;
+                }
+                // 其他怪物的战斗选项（2-6）类似，需补充完整参数和逻辑
+                break;
+            }
+            case '2':
+                landTemple(baseHp, hasDefeatedLingxuzi, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit);
+                break;
+            case '3':
+                shenhou(canUpgradeDrink, maxDrinkCount);
+                break;
+            case '4':
+                std::cout << "退出游戏。" << std::endl;
+                return 0;
+            default:
+                std::cout << "无效选择。" << std::endl;
+        }
+    }
+    return 0;
+}
