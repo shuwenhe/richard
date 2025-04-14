@@ -540,7 +540,7 @@ int main() {
 
     while (true) {
         std::cout << "\n《 黑神话：悟空 》" << std::endl;
-        std::cout << "1. 打怪" << std::endl;i
+        std::cout << "1. 打怪" << std::endl;
         std::cout << "2. 土地庙" << std::endl;
         std::cout << "3. 人物（申猴）" << std::endl;
         std::cout << "4. 退出" << std::endl;
@@ -561,37 +561,37 @@ int main() {
                 char fightChoice;
                 if (!(std::cin >> fightChoice) || !isValidInput()) continue;
                 if (fightChoice == '1' && !hasDefeatedBigMonster) {
-                    genericFight(3000, 50, 20, 200, playerHp, wineCount, mana, canTransform,
+                    genericFight(3000, 50, 20, 100, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "大头怪",
                                  true, hasDefeatedBigMonster, canUpgradeDrink,
                                  maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
                                  hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
                 } else if (fightChoice == '2' && !hasDefeatedGuangzhiEnemy) {
-                    genericFight(2500, 30, 15, 180, playerHp, wineCount, mana, canTransform,
+                    genericFight(2500, 30, 15, 80, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "广智",
                                  false, hasDefeatedGuangzhiEnemy, canUpgradeDrink,
                                  maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
                                  hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
                 } else if (fightChoice == '3' && !hasDefeatedLingxuziEnemy) {
-                    genericFight(2800, 35, 18, 220, playerHp, wineCount, mana, canTransform,
+                    genericFight(2800, 35, 18, 100, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "灵虚子",
                                  true, hasDefeatedLingxuziEnemy, canUpgradeDrink,
                                  maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
                                  hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
                 } else if (fightChoice == '4' && !hasDefeatedGuangmou) {
-                    genericFight(2600, 35, 16, 200, playerHp, wineCount, mana, canTransform,
+                    genericFight(2600, 35, 36, 50, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "广谋",
                                  true, hasDefeatedGuangmou, canUpgradeDrink,
                                  maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
                                  hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
                 } else if (fightChoice == '5' && !hasDefeatedWhiteScholar) {
-                    fightWithWhiteScholar(2200, 2500, 50, 17, 210,
+                    fightWithWhiteScholar(2200, 2500, 50, 17, 200,
                                           playerHp, wineCount, mana, canTransform, hasDefeatedGuangzhi,
                                           hasTransformed, hasDefeatedWhiteScholar,
                                           maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
                                           hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
                 } else if (fightChoice == '6' && !hasDefeatedBlackWindKing) {
-                    genericFight(4000, 80, 25, 300, playerHp, wineCount, mana, canTransform,
+                    genericFight(4000, 80, 25, 200, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "黑风大王",
                                  true, hasDefeatedBlackWindKing, canUpgradeDrink,
                                  maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
