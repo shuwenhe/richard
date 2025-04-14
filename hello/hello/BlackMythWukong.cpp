@@ -20,26 +20,62 @@ void handleAttack(int& targetHp, int damage, const std::string& enemyName) {
     std::cout << enemyName << "攻击，你失去 " << damage << " 生命值。" << std::endl;
 }
 
+// 广智形态战斗
+void fightAsGuangzhi(int& enemyHp, int& playerHp, int& attackCount, int& mana, int& freezeCount, int& stickStyle, int& qiStrength) {
+    int gzHp = 800;
+    while (enemyHp > 0 && gzHp > 0) {
+        std::cout << "敌人HP: " << enemyHp << ", 广智HP: " << gzHp << ", 法力: " << mana << ", 棍式: " << stickStyle << ", 气力: " << qiStrength << std::endl;
+        std::cout << "1.攻击 2.躲避 5.定身术: ";
+        char choice;
+        if (!(std::cin >> choice) ||!isValidInput()) continue;
+        if (choice == '1') {
+            int damage = ++attackCount % 3? 30 : 200;
+            std::cout << "造成 " << damage << " 伤害。" << std::endl;
+            enemyHp -= damage;
+            stickStyle += 20;
+            qiStrength = std::min(qiStrength + 10, 300);
+            if (enemyHp > 0 &&!freezeCount) {
+                int enemyDamage = rand() % 100 < 10? 80 : 30;
+                std::cout << "敌人反击！输入 2 躲避: ";
+                char dodge;
+                if (!(std::cin >> dodge) ||!isValidInput()) continue;
+                if (dodge != '2' || rand() % 100 >= 60) handleAttack(gzHp, enemyDamage, "敌人");
+            }
+        } else if (choice == '5') {
+            if (mana >= 50) {
+                mana -= 50;
+                freezeCount = 5;
+                std::cout << "敌人被定身 5 回合。" << std::endl;
+            } else std::cout << "法力不足。" << std::endl;
+            qiStrength = std::min(qiStrength + 10, 300);
+        }
+        if (freezeCount > 0) freezeCount--;
+    }
+    if (gzHp <= 0) std::cout << "广智形态被击败，变回本体。" << std::endl;
+}
+
 // 获取棍式阶段
 int getStickStylePhase(int stickStyle) {
-    return stickStyle / 100;
+    return std::min(stickStyle / 100, 4);
 }
 
 // 获取技能伤害
 int getSkillDamage(int phase, char skill) {
-    switch (phase) {
-        case 0:
-        case 1:
-            return 200;
-        case 2:
-            return 250;
-        case 3:
-            return (skill == 'z') ? 350 : 300;
-        case 4:
-            return (skill == 'z') ? 500 : 400;
-        default:
-            return 0;
+    if (skill == '9') {
+        switch (phase) {
+            case 1:
+                return 200;
+            case 2:
+                return 250;
+            case 3:
+                return 300;
+            case 4:
+                return 350;
+            default:
+                return 0;
+        }
     }
+    return 0;
 }
 
 // 处理玩家操作
@@ -57,7 +93,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
     }
     std::cout << "当前棍式: " << stickStyle << ", 棍式阶段: " << getStickStylePhase(stickStyle) << ", 气力: " << qiStrength << std::endl;
     char choice;
-    std::cout << "1.攻击 2.躲避 3.喝酒 4.变身 5.定身术 6.使用精魂 7.聚型散气 8.蓄力 9.重棍 z.劈棍 x.立棍 c.戳棍: ";
+    std::cout << "1.攻击 2.躲避 3.喝酒 4.变身 5.定身术 6.使用精魂 7.聚型散气 8.蓄力 9.重棍: ";
     if (!(std::cin >> choice) ||!isValidInput()) return;
     bool playerAttacked = false;
     inputCount++;
@@ -73,8 +109,8 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
                     invisibleCounter = 0;
                     inputCount = 0;
                 } else {
-                    int damage = rand() % 100 < 10 ? 100 : 30;
-                    std::cout << (damage == 100 ? "暴击！" : "") << "造成 " << damage << " 伤害。" << std::endl;
+                    int damage = rand() % 100 < 10? 100 : 30;
+                    std::cout << (damage == 100? "暴击！" : "") << "造成 " << damage << " 伤害。" << std::endl;
                     if (canDodge &&!freezeCount && rand() % 100 < 20) std::cout << enemyName << "闪避。" << std::endl;
                     else enemyHp -= damage;
                 }
@@ -94,7 +130,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
                     handleAttack(playerHp, enemyDamage, enemyName);
                 }
             } else if (enemyHp > 0 &&!freezeCount &&!isInvisible) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -110,7 +146,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
                 std::cout << "气力不足，无法闪避。" << std::endl;
             }
             if (enemyHp > 0 &&!freezeCount &&!isInvisible) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -126,7 +162,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
             } else std::cout << "无酒。" << std::endl;
             qiStrength = std::min(qiStrength + 10, 300);
             if (!isInvisible &&!freezeCount && rand() % 100 < 60) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -137,42 +173,13 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
         case '4': {
             if (canTransform &&!hasTransformed) {
                 int tempEnemyHp = enemyHp;
-                int gzHp = 800;
-                while (tempEnemyHp > 0 && gzHp > 0) {
-                    std::cout << "敌人HP: " << tempEnemyHp << ", 广智HP: " << gzHp << ", 法力: " << mana << ", 棍式: " << stickStyle << ", 气力: " << qiStrength << std::endl;
-                    std::cout << "1.攻击 2.躲避 5.定身术: ";
-                    char gzChoice;
-                    if (!(std::cin >> gzChoice) ||!isValidInput()) continue;
-                    if (gzChoice == '1') {
-                        int damage = ++attackCount % 3 ? 30 : 200;
-                        std::cout << "造成 " << damage << " 伤害。" << std::endl;
-                        tempEnemyHp -= damage;
-                        stickStyle += 20;
-                        qiStrength = std::min(qiStrength + 10, 300);
-                        if (tempEnemyHp > 0 &&!freezeCount) {
-                            int enemyDamage = rand() % 100 < 10 ? 80 : 30;
-                            std::cout << "敌人反击！输入 2 躲避: ";
-                            char dodge;
-                            if (!(std::cin >> dodge) ||!isValidInput()) continue;
-                            if (dodge != '2' || rand() % 100 >= 60) handleAttack(gzHp, enemyDamage, "敌人");
-                        }
-                    } else if (gzChoice == '5') {
-                        if (mana >= 50) {
-                            mana -= 50;
-                            freezeCount = 5;
-                            std::cout << "敌人被定身 5 回合。" << std::endl;
-                        } else std::cout << "法力不足。" << std::endl;
-                        qiStrength = std::min(qiStrength + 10, 300);
-                    }
-                    if (freezeCount > 0) freezeCount--;
-                }
-                if (gzHp <= 0) std::cout << "广智形态被击败，变回本体。" << std::endl;
+                fightAsGuangzhi(tempEnemyHp, playerHp, attackCount, mana, freezeCount, stickStyle, qiStrength);
                 enemyHp = tempEnemyHp;
                 hasTransformed = true;
             } else std::cout << "无法变身。" << std::endl;
             qiStrength = std::min(qiStrength + 10, 300);
             if (!isInvisible &&!freezeCount && rand() % 100 < 60) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -188,7 +195,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
             } else std::cout << "法力不足。" << std::endl;
             qiStrength = std::min(qiStrength + 10, 300);
             if (!isInvisible &&!freezeCount && rand() % 100 < 60) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -208,7 +215,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
             }
             qiStrength = std::min(qiStrength + 10, 300);
             if (!isInvisible &&!freezeCount && rand() % 100 < 60) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -238,7 +245,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
                 std::cout << "气力不足，无法蓄力。" << std::endl;
             }
             if (!isInvisible &&!freezeCount && rand() % 100 < 60) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -246,20 +253,15 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
             }
             break;
         }
-        case '9':
-        case 'z':
-        case 'x':
-        case 'c': {
+        case '9': {
             int phase = getStickStylePhase(stickStyle);
             int damage = getSkillDamage(phase, choice);
             enemyHp -= damage;
-            std::cout << (choice == '9' ? "重棍" : (choice == 'z' ? "劈棍" : (choice == 'x' ? "立棍" : "戳棍")))
-                      << "攻击，造成 " << damage << " 伤害。" << std::endl;
-            if (choice != '9') stickStyle += 20;
-            else stickStyle = 0;
+            std::cout << "重棍攻击，造成 " << damage << " 伤害。" << std::endl;
+            stickStyle = 0;
             qiStrength = std::min(qiStrength + 10, 300);
             if (enemyHp > 0 &&!freezeCount &&!isInvisible) {
-                int actualDamage = enemySkillChance > rand() % 100 ? enemySkillDamage : enemyDamage;
+                int actualDamage = enemySkillChance > rand() % 100? enemySkillDamage : enemyDamage;
                 std::cout << enemyName << "攻击！输入 2 躲避: ";
                 char dodge;
                 if (!(std::cin >> dodge) ||!isValidInput()) break;
@@ -286,7 +288,7 @@ void handlePlayerAction(int& enemyHp, int& playerHp, int& wineCount, int& mana, 
 void genericFight(int enemyMaxHp, int enemyDamage, int enemySkillChance, int enemySkillDamage,
                   int& playerHp, int& wineCount, int& mana, bool& canTransform, bool& hasDefeatedGuangzhi,
                   bool& hasTransformed, const std::string& enemyName,
-                  bool canDodge, bool& hasDefeatedThisEnemy, bool& canUpgradeDrink,
+                  bool canDodge, int snakeCount, bool& hasDefeatedLingxuzi, int& baseHp, bool& hasDefeatedThisEnemy, bool& canUpgradeDrink,
                   int& maxDrinkCount, bool& hasBigHeadSpirit, bool& hasGuangmouSpirit, int& currentSpirit, int& attackCounter,
                   bool& hasDefeatedBlackWindKing, int& invisibleCounter, bool& isInvisible, int& inputCount, int& stickStyle, int& qiStrength) {
     int enemyHp = enemyMaxHp;
@@ -301,10 +303,11 @@ void genericFight(int enemyMaxHp, int enemyDamage, int enemySkillChance, int ene
     stickStyle = 0;
     qiStrength = 300;
     while (true) {
-        playerHp = 330;
+        playerHp = baseHp;
         wineCount = 5;
         mana = 300;
         hasTransformed = false;
+        snakeCount = 0;
         std::cout << "遭遇 " << enemyName << "，敌人HP: " << enemyHp << std::endl;
         std::cout << "是否战斗？(y/n): ";
         char fight;
@@ -318,6 +321,8 @@ void genericFight(int enemyMaxHp, int enemyDamage, int enemySkillChance, int ene
                                blackWindCounter, blackWindPhase, maxDrinkCount,
                                currentSpirit, hasBigHeadSpirit, hasGuangmouSpirit, attackCounter,
                                hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+            if (snakeCount-- == 0 && enemyName == "广谋") handleAttack(playerHp, 10, "广谋召唤的小蛇");
+
             if (enemyName == "黑风大王" && enemyHp <= blackWindTriggerHp - 2000 && blackWindPhase == 0) {
                 std::cout << "黑风大王变为黑风状态！接下来五次攻击无效。" << std::endl;
                 blackWindPhase = 1;
@@ -331,7 +336,8 @@ void genericFight(int enemyMaxHp, int enemyDamage, int enemySkillChance, int ene
                 canTransform = hasDefeatedGuangzhi = true;
                 std::cout << "获得变身能力。";
             } else if (enemyName == "灵虚子") {
-                playerHp += 100;
+                hasDefeatedLingxuzi = true;
+                baseHp += 100;
                 std::cout << "获得金丹一枚，基础生命值增加 100。";
                 std::cout << "获得行者套，装备后增加 60 生命值。";
             } else if (enemyName == "广谋") {
@@ -353,7 +359,7 @@ void genericFight(int enemyMaxHp, int enemyDamage, int enemySkillChance, int ene
         char retry;
         if (!(std::cin >> retry) ||!isValidInput()) continue;
         if (retry != 'y') break;
-        enemyHp = enemyMaxHp;
+        enemyHp = enemyMaxHp; // 被击败后怪物HP恢复到满值
         stickStyle = 0;
         qiStrength = 300;
     }
@@ -362,7 +368,7 @@ void genericFight(int enemyMaxHp, int enemyDamage, int enemySkillChance, int ene
 // 白衣秀士战斗函数
 void fightWithWhiteScholar(int enemyMaxHpPhase1, int enemyMaxHpPhase2, int enemyDamage, int enemySkillChance, int enemySkillDamage,
                            int& playerHp, int& wineCount, int& mana, bool& canTransform, bool& hasDefeatedGuangzhi,
-                           bool& hasTransformed, bool& hasDefeatedWhiteScholar,
+                           bool& hasTransformed, bool& hasDefeatedLingxuzi, int& baseHp, bool& hasDefeatedWhiteScholar,
                            int& maxDrinkCount, bool& hasBigHeadSpirit, bool& hasGuangmouSpirit, int& currentSpirit, int& attackCounter,
                            bool& hasDefeatedBlackWindKing, int& invisibleCounter, bool& isInvisible, int& inputCount, int& stickStyle, int& qiStrength) {
     int enemyHpPhase1 = enemyMaxHpPhase1;
@@ -378,7 +384,7 @@ void fightWithWhiteScholar(int enemyMaxHpPhase1, int enemyMaxHpPhase2, int enemy
     qiStrength = 300;
 
     while (true) {
-        playerHp = 330;
+        playerHp = baseHp;
         wineCount = 5;
         mana = 300;
         hasTransformed = false;
@@ -406,7 +412,7 @@ void fightWithWhiteScholar(int enemyMaxHpPhase1, int enemyMaxHpPhase2, int enemy
             // 二阶段战斗
             while (enemyHpPhase2 > 0 && playerHp > 0) {
                 std::cout << "白衣秀士HP: " << enemyHpPhase2 << ", 你HP: " << playerHp << ", 法力: " << mana << ", 棍式: " << stickStyle << ", 气力: " << qiStrength << std::endl;
-                enemyHpPhase2 += 5;
+                enemyHpPhase2 += 5; // 每次玩家输入回5生命值
                 handlePlayerAction(enemyHpPhase2, playerHp, wineCount, mana, attackCount, freezeCount,
                                    canTransform, hasTransformed, "白衣秀士",
                                    enemyDamage, enemySkillChance, enemySkillDamage, true,
@@ -426,16 +432,16 @@ void fightWithWhiteScholar(int enemyMaxHpPhase1, int enemyMaxHpPhase2, int enemy
         char retry;
         if (!(std::cin >> retry) ||!isValidInput()) continue;
         if (retry != 'y') break;
-        enemyHpPhase1 = enemyMaxHpPhase1;
-        enemyHpPhase2 = enemyMaxHpPhase2;
+        enemyHpPhase1 = enemyMaxHpPhase1; // 被击败后一阶段HP恢复到满值
+        enemyHpPhase2 = enemyMaxHpPhase2; // 被击败后二阶段HP恢复到满值
         stickStyle = 0;
         qiStrength = 300;
     }
 }
 
 // 土地庙整顿装备函数
-void landTemple(int& playerHp, bool& hasDefeatedLingxuzi, bool& hasBigHeadSpirit, bool& hasGuangmouSpirit, int& currentSpirit) {
-    std::cout << "你来到了土地庙，当前基础生命值: " << playerHp << std::endl;
+void landTemple(int& baseHp, bool& hasDefeatedLingxuzi, bool& hasBigHeadSpirit, bool& hasGuangmouSpirit, int& currentSpirit) {
+    std::cout << "你来到了土地庙，当前基础生命值: " << baseHp << std::endl;
     std::cout << "你拥有的装备：虎皮裙（增加 30 HP）";
     if (hasDefeatedLingxuzi) std::cout << "，行者套（增加 60 HP）";
     std::cout << std::endl;
@@ -457,9 +463,9 @@ void landTemple(int& playerHp, bool& hasDefeatedLingxuzi, bool& hasBigHeadSpirit
         char subChoice;
         if (!(std::cin >> subChoice) ||!isValidInput()) return;
         if (subChoice == '1') {
-            playerHp = hasDefeatedLingxuzi ? 360 : 330;
+            baseHp = hasDefeatedLingxuzi? 300 + 60 : 300 + 30;
             std::cout << "你穿上了" << (hasDefeatedLingxuzi? "行者套" : "虎皮裙")
-                      << "，当前基础生命值变为: " << playerHp << std::endl;
+                      << "，当前基础生命值变为: " << baseHp << std::endl;
         } else if (subChoice == '2') {
             if (hasBigHeadSpirit || hasGuangmouSpirit) {
                 std::cout << "1. 大头怪精魂" << std::endl;
@@ -512,9 +518,10 @@ void shenhou(bool& canUpgradeDrink, int& maxDrinkCount) {
 }
 int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
-    int playerHp = 330, wineCount = 5, mana = 300;
+    int playerHp = 300, wineCount = 5, mana = 300;
     bool canTransform = false, hasDefeatedGuangzhi = false, hasTransformed = false;
     bool hasDefeatedLingxuzi = false;
+    int baseHp = 300 + 30; // 初始装备虎皮裙
 
     bool hasDefeatedBigMonster = false;
     bool hasDefeatedGuangzhiEnemy = false;
@@ -536,17 +543,17 @@ int main() {
     int stickStyle = 0;
     int qiStrength = 300;
 
-    landTemple(playerHp, hasDefeatedLingxuzi, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit);
+    landTemple(baseHp, hasDefeatedLingxuzi, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit);
 
     while (true) {
-        std::cout << "\n《 黑神话：悟空 》" << std::endl;
+        std::cout << "\n=== 黑神话：悟空 ===" << std::endl;
         std::cout << "1. 打怪" << std::endl;
         std::cout << "2. 土地庙" << std::endl;
         std::cout << "3. 人物（申猴）" << std::endl;
         std::cout << "4. 退出" << std::endl;
         std::cout << "请选择: ";
         char mainChoice;
-        if (!(std::cin >> mainChoice) || !isValidInput()) continue;
+        if (!(std::cin >> mainChoice) ||!isValidInput()) continue;
         switch (mainChoice) {
             case '1': {
                 std::cout << "可选战斗：";
@@ -559,58 +566,56 @@ int main() {
                 std::cout << std::endl;
                 std::cout << "请选择要挑战的怪物（输入对应数字，输入其他返回主菜单）: ";
                 char fightChoice;
-                if (!(std::cin >> fightChoice) || !isValidInput()) continue;
-                if (fightChoice == '1' && !hasDefeatedBigMonster) {
-                    genericFight(3000, 50, 20, 100, playerHp, wineCount, mana, canTransform,
+                if (!(std::cin >> fightChoice) ||!isValidInput()) continue;
+                if (fightChoice == '1' &&!hasDefeatedBigMonster) {
+                    genericFight(3000, 50, 20, 200, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "大头怪",
-                                 true, hasDefeatedBigMonster, canUpgradeDrink,
-                                 maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
-                                 hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
-                } else if (fightChoice == '2' && !hasDefeatedGuangzhiEnemy) {
-                    genericFight(2500, 30, 15, 80, playerHp, wineCount, mana, canTransform,
+                                 true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedBigMonster,
+                                 canUpgradeDrink, maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit,
+                                 currentSpirit, attackCounter, hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+                } else if (fightChoice == '2' &&!hasDefeatedGuangzhiEnemy) {
+                    genericFight(2000, 30, 10, 100, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "广智",
-                                 false, hasDefeatedGuangzhiEnemy, canUpgradeDrink,
-                                 maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
-                                 hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
-                } else if (fightChoice == '3' && !hasDefeatedLingxuziEnemy) {
-                    genericFight(2800, 35, 18, 100, playerHp, wineCount, mana, canTransform,
+                                 true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedGuangzhiEnemy,
+                                 canUpgradeDrink, maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit,
+                                 currentSpirit, attackCounter, hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+                } else if (fightChoice == '3' &&!hasDefeatedLingxuziEnemy) {
+                    genericFight(1500, 40, 15, 150, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "灵虚子",
-                                 true, hasDefeatedLingxuziEnemy, canUpgradeDrink,
-                                 maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
-                                 hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
-                } else if (fightChoice == '4' && !hasDefeatedGuangmou) {
-                    genericFight(2600, 35, 36, 50, playerHp, wineCount, mana, canTransform,
+                                 true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedLingxuziEnemy,
+                                 canUpgradeDrink, maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit,
+                                 currentSpirit, attackCounter, hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+                } else if (fightChoice == '4' &&!hasDefeatedGuangmou) {
+                    genericFight(2500, 45, 20, 200, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "广谋",
-                                 true, hasDefeatedGuangmou, canUpgradeDrink,
-                                 maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
-                                 hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
-                } else if (fightChoice == '5' && !hasDefeatedWhiteScholar) {
-                    fightWithWhiteScholar(2200, 2500, 50, 17, 200,
-                                          playerHp, wineCount, mana, canTransform, hasDefeatedGuangzhi,
-                                          hasTransformed, hasDefeatedWhiteScholar,
+                                 true, 3, hasDefeatedLingxuzi, baseHp, hasDefeatedGuangmou,
+                                 canUpgradeDrink, maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit,
+                                 currentSpirit, attackCounter, hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+                } else if (fightChoice == '5' &&!hasDefeatedWhiteScholar) {
+                    fightWithWhiteScholar(1800, 2200, 40, 15, 150, playerHp, wineCount, mana, canTransform,
+                                          hasDefeatedGuangzhi, hasTransformed, hasDefeatedLingxuzi, baseHp, hasDefeatedWhiteScholar,
                                           maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
                                           hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
-                } else if (fightChoice == '6' && !hasDefeatedBlackWindKing) {
-                    genericFight(4000, 80, 25, 200, playerHp, wineCount, mana, canTransform,
+                } else if (fightChoice == '6' &&!hasDefeatedBlackWindKing) {
+                    genericFight(5000, 60, 25, 250, playerHp, wineCount, mana, canTransform,
                                  hasDefeatedGuangzhi, hasTransformed, "黑风大王",
-                                 true, hasDefeatedBlackWindKing, canUpgradeDrink,
-                                 maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit, attackCounter,
-                                 hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
+                                 true, 0, hasDefeatedLingxuzi, baseHp, hasDefeatedBlackWindKing,
+                                 canUpgradeDrink, maxDrinkCount, hasBigHeadSpirit, hasGuangmouSpirit,
+                                 currentSpirit, attackCounter, hasDefeatedBlackWindKing, invisibleCounter, isInvisible, inputCount, stickStyle, qiStrength);
                 }
                 break;
             }
             case '2':
-                landTemple(playerHp, hasDefeatedLingxuzi, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit);
+                landTemple(baseHp, hasDefeatedLingxuzi, hasBigHeadSpirit, hasGuangmouSpirit, currentSpirit);
                 break;
             case '3':
                 shenhou(canUpgradeDrink, maxDrinkCount);
                 break;
             case '4':
-                std::cout << "退出游戏。" << std::endl;
                 return 0;
             default:
                 std::cout << "无效选择，请重新输入。" << std::endl;
         }
     }
     return 0;
-}
+}    
