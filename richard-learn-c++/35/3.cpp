@@ -6,7 +6,7 @@ int main(){
 	int n;
 	cin>>n;
 	int a[101];
-	int t = 0,sum = 0;
+	int sum = 0,t = 0;
 	for(int i = 1;i <= n;i++){
 		cin>>a[i];
 		sum += a[i];
