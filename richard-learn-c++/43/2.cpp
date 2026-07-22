@@ -15,7 +15,7 @@ int main(){
 				max = j;
 			}
 		}
-		t = a[i];
+		int t = a[i];
 		a[i] = a[max];
 		a[max] = t;
 	}
