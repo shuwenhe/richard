@@ -22,8 +22,8 @@ int main(){
 		if(i <= m){
 			sum += 2 * a[i];
 		}else{
-			sum += a[i];
-		}
+				sum += a[i];
+			}
 	}
 	cout<<sum<<endl;
 }

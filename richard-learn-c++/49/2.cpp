@@ -1,0 +1,9 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+int main(){
+	char s[101];
+	scanf("%s",s);
+	printf("%s",s);
+}
