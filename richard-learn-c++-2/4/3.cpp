@@ -2,10 +2,9 @@
 
 using namespace std;
 
-int l,m;
-bool b[10001];
-
 int main(){
+        int l,m;
+        bool b[10001];
 	memset(b,false,sizeof(b));
 	scanf("%d%d",&l,&m);
 	for(int i = 1;i <= m;i++){
