@@ -21,7 +21,7 @@ int main(){
 			cout<<"Thursday"<<endl;
 			break;
 		case 5:
-			cout<<"Eriday";
+			cout<<"Friday";
 			break;
 		case 6:
 			cout<<"Saturday";
